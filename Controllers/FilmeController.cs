@@ -25,7 +25,6 @@ namespace FilmesAPI.Controllers
         [HttpPost]
         public IActionResult AdicionaFilme([FromBody] Filme filme)
         {
-
             _context.Filmes.Add(filme);
             _context.SaveChanges();
             // CreatedAtAction Serve para indicar onde esse recurso foi criado e como fazemos para retornar ele
@@ -43,8 +42,8 @@ namespace FilmesAPI.Controllers
         public IActionResult RecuperarFilmesPorId(int id)
         {
             // Esses 2 tipos de retorno ( Ok , NotFound ) são do tipo IActionResult
-
             Filme filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
+            
             if(filme != null)
             {
                 // Ok seria um code 200 sucesso
@@ -52,6 +51,42 @@ namespace FilmesAPI.Controllers
             }
             // NotFound representa um erro 404
             return NotFound();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult AtualizarFilme(int id, [FromBody] Filme filmeNovo)
+        {
+            // Busca um filme pelo ID e sobrescreve ele com o filme recebido no corpo da requisição   
+            Filme filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
+            
+            if(filme == null)
+            {
+                return NotFound();
+            }
+            
+            filme.Titulo = filmeNovo.Titulo;
+            filme.Genero = filmeNovo.Genero;
+            filme.Duracao = filmeNovo.Duracao;
+            filme.Diretor = filmeNovo.Diretor;
+            _context.SaveChanges();
+
+            // Sucesso porem sem conteudo de retorno ( 204 No Content )
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeletarFilme(int id)
+        {
+            Filme filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
+
+            if (filme == null)
+            {
+                return NotFound();
+            }
+            _context.Remove(filme);
+            _context.SaveChanges();
+
+            return NoContent();
         }
 
     }
