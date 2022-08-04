@@ -1,4 +1,5 @@
 ﻿using FilmesAPI.Data;
+using FilmesAPI.Data.DTOS;
 using FilmesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -23,8 +24,17 @@ namespace FilmesAPI.Controllers
 
         //Metodo Post para inserção de informação
         [HttpPost]
-        public IActionResult AdicionaFilme([FromBody] Filme filme)
+        public IActionResult AdicionaFilme([FromBody] CreateFilmeDto filmeDto)
         {
+            // Construção de um objeto com o construtor implicito
+            Filme filme = new Filme
+            {
+                Titulo = filmeDto.Titulo,
+                Genero = filmeDto.Genero,
+                Duracao = filmeDto.Duracao,
+                Diretor = filmeDto.Diretor
+            };
+
             _context.Filmes.Add(filme);
             _context.SaveChanges();
             // CreatedAtAction Serve para indicar onde esse recurso foi criado e como fazemos para retornar ele
@@ -47,14 +57,24 @@ namespace FilmesAPI.Controllers
             if(filme != null)
             {
                 // Ok seria um code 200 sucesso
-                return Ok(filme);
+                ReadFilmeDto filmeDto = new ReadFilmeDto
+                {
+                    Titulo = filme.Titulo,
+                    Genero = filme.Genero,
+                    Diretor = filme.Diretor,
+                    Id = filme.Id,
+                    Duracao = filme.Duracao,
+                    HoraDaConstula = DateTime.Now
+                };
+
+                return Ok(filmeDto);
             }
             // NotFound representa um erro 404
             return NotFound();
         }
 
         [HttpPut("{id}")]
-        public IActionResult AtualizarFilme(int id, [FromBody] Filme filmeNovo)
+        public IActionResult AtualizarFilme(int id, [FromBody] UpdateFilmeDto filmeDto)
         {
             // Busca um filme pelo ID e sobrescreve ele com o filme recebido no corpo da requisição   
             Filme filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
@@ -64,10 +84,10 @@ namespace FilmesAPI.Controllers
                 return NotFound();
             }
             
-            filme.Titulo = filmeNovo.Titulo;
-            filme.Genero = filmeNovo.Genero;
-            filme.Duracao = filmeNovo.Duracao;
-            filme.Diretor = filmeNovo.Diretor;
+            filme.Titulo = filmeDto.Titulo;
+            filme.Genero = filmeDto.Genero;
+            filme.Duracao = filmeDto.Duracao;
+            filme.Diretor = filmeDto.Diretor;
             _context.SaveChanges();
 
             // Sucesso porem sem conteudo de retorno ( 204 No Content )
