@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FilmesAPI.Data
 {
-    // Classe para cuidar do banco tem que erdar o DbContext
+    // Classe para cuidar do banco tem que herdar o DbContext
     public class FilmeContext : DbContext
     {
 

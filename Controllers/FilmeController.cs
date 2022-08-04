@@ -1,4 +1,5 @@
-﻿using FilmesAPI.Models;
+﻿using FilmesAPI.Data;
+using FilmesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,33 +13,38 @@ namespace FilmesAPI.Controllers
     [Route("[controller]")]
     public class FilmeController : ControllerBase
     {
-        private static List<Filme> filmes = new List<Filme>();
-        private static int id = 1;
+
+        private FilmeContext _context;
+
+        public FilmeController(FilmeContext context)
+        {
+            _context = context;
+        }
 
         //Metodo Post para inserção de informação
         [HttpPost]
         public IActionResult AdicionaFilme([FromBody] Filme filme)
         {
-            filme.Id = id++; 
-            filmes.Add(filme);
-            Console.WriteLine(filme.Titulo);
+
+            _context.Filmes.Add(filme);
+            _context.SaveChanges();
             // CreatedAtAction Serve para indicar onde esse recurso foi criado e como fazemos para retornar ele
             return CreatedAtAction(nameof(RecuperarFilmesPorId), new { Id = filme.Id }, filme);
         }
     
         //Metodo Get para retornar as informações
         [HttpGet]
-        public IActionResult RecuperarFilmes()
+        public IEnumerable<Filme> RecuperarFilmes()
         {
-            return Ok(filmes);
+            return _context.Filmes;
         }
 
-        [HttpGet("filme={id}")]
+        [HttpGet("{id}")]
         public IActionResult RecuperarFilmesPorId(int id)
         {
             // Esses 2 tipos de retorno ( Ok , NotFound ) são do tipo IActionResult
 
-            Filme filme = filmes.FirstOrDefault(filme => filme.Id == id);
+            Filme filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
             if(filme != null)
             {
                 // Ok seria um code 200 sucesso

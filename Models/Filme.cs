@@ -8,6 +8,10 @@ namespace FilmesAPI.Models
 {
     public class Filme
     {
+        // Key define a chave primaria 
+        // Required define como obrigatorio 
+        [Key]
+        [Required]
         public int Id { get; set; }
 
         //Definindo esse campo como obrigatorio e informando uma mensagem de erro
