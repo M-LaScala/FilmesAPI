@@ -13,6 +13,9 @@ namespace FilmesAPI.Data.DTOS
 
         // Key define a chave primaria 
         // Required define como obrigatorio 
+
+        private DateTime _HoraDaConsulta = DateTime.Now;
+
         [Key]
         [Required]
         public int Id { get; set; }
@@ -31,6 +34,9 @@ namespace FilmesAPI.Data.DTOS
         //Definindo o intervalo que vai ser aceito nesse campo 
         [Range(1, 600)]
         public int Duracao { get; set; }   
-        public DateTime HoraDaConstula { get; set; }
+        public DateTime HoraDaConsulta 
+        { 
+            get => _HoraDaConsulta;
+        }
     }
 }

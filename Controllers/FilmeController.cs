@@ -1,4 +1,5 @@
-﻿using FilmesAPI.Data;
+﻿using AutoMapper;
+using FilmesAPI.Data;
 using FilmesAPI.Data.DTOS;
 using FilmesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -16,25 +17,21 @@ namespace FilmesAPI.Controllers
     {
 
         private FilmeContext _context;
+        private IMapper _mapper;
 
-        public FilmeController(FilmeContext context)
+        public FilmeController(FilmeContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         //Metodo Post para inserção de informação
         [HttpPost]
         public IActionResult AdicionaFilme([FromBody] CreateFilmeDto filmeDto)
         {
-            // Construção de um objeto com o construtor implicito
-            Filme filme = new Filme
-            {
-                Titulo = filmeDto.Titulo,
-                Genero = filmeDto.Genero,
-                Duracao = filmeDto.Duracao,
-                Diretor = filmeDto.Diretor
-            };
-
+            // Construção de um objeto com o construtor implicito ( Apagado )
+            // Conversão ultilizando o Mapper de um objeto do tipo CreateFilmeDto para um objeto do tipo Filme
+            Filme filme = _mapper.Map<Filme>(filmeDto);
             _context.Filmes.Add(filme);
             _context.SaveChanges();
             // CreatedAtAction Serve para indicar onde esse recurso foi criado e como fazemos para retornar ele
@@ -57,15 +54,8 @@ namespace FilmesAPI.Controllers
             if(filme != null)
             {
                 // Ok seria um code 200 sucesso
-                ReadFilmeDto filmeDto = new ReadFilmeDto
-                {
-                    Titulo = filme.Titulo,
-                    Genero = filme.Genero,
-                    Diretor = filme.Diretor,
-                    Id = filme.Id,
-                    Duracao = filme.Duracao,
-                    HoraDaConstula = DateTime.Now
-                };
+                // Conversão ultilizando Mapper 
+                ReadFilmeDto filmeDto = _mapper.Map<ReadFilmeDto>(filme);
 
                 return Ok(filmeDto);
             }
@@ -83,11 +73,9 @@ namespace FilmesAPI.Controllers
             {
                 return NotFound();
             }
-            
-            filme.Titulo = filmeDto.Titulo;
-            filme.Genero = filmeDto.Genero;
-            filme.Duracao = filmeDto.Duracao;
-            filme.Diretor = filmeDto.Diretor;
+
+            // Sobrescrevendo filme com os dados do filme Dto ( AutoMapper )
+            _mapper.Map(filmeDto, filme);
             _context.SaveChanges();
 
             // Sucesso porem sem conteudo de retorno ( 204 No Content )
